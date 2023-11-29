@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+struct Block {
+    int size;
+    int free;
+    struct Block *next;
+};
+
+struct Block *getBlock(int size) {
+    struct Block *block = (struct Block *)malloc(sizeof(struct Block));
+    block->size = size;
+    block->free = 1;
+    block->next = NULL;
+    return block;
+}
+
+void addBlock(struct Block **start, int size) {
+    struct Block *newBlock = getBlock(size);
+    newBlock->next = *start;
+    *start = newBlock;
+}
+
+void printMemoryBlock(struct Block *block) {
+    while (block != NULL) {
+        printf("Size: %d\t", block->size);
+        printf("Free: %d\n", block->free);
+        block = block->next;
+    }
+}
+
+int worstFit(struct Block **start, int size) {
+    int maxIndex = -1;
+    struct Block *currentBlock = *start;
+
+    while (currentBlock != NULL) {
+        if (currentBlock->free && currentBlock->size >= size) {
+            maxIndex = currentBlock->size;
+        }
+        currentBlock = currentBlock->next;
+    }
+
+    return maxIndex;
+}
+
+int main() {
+    int n, i, j, k, size, maxIndex;
+    struct Block *start = NULL;
+
+    printf("Enter the number of blocks: ");
+    scanf("%d", &n);
+
+    printf("Enter the size of each block:\n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &size);
+        addBlock(&start, size);
+    }
+
+    printf("Memory blocks:\n");
+    printMemoryBlock(start);
+
+    printf("Enter the size of process: ");
+    scanf("%d", &size);
+
+    maxIndex = worstFit(&start, size);
+    if (maxIndex != -1) {
+        printf("Worst fit memory block index: %d\n", maxIndex);
+    } else {
+        printf("No worst fit memory block available.\n");
+    }
+
+    return 0;
+}
